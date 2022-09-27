@@ -1,0 +1,3 @@
+[submodule "creative-engine"]
+	path = creative-engine
+	url = https://github.com/szymor/creative-engine
