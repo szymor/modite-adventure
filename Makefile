@@ -12,7 +12,7 @@ SOURCES += $(shell find $(CREATIVE_ENGINE_SOURCE_DIR) -type f -name '*.c*')
 
 RESOURCES_BIN = $(GAME_SOURCE_DIR)/Resources.bin
 RESOURCES_BIN_O = $(BUILD_DIR)/Resources.bin
-
+RESOURCES_ZIP = $(GAME_SOURCE_DIR)/Resources.zip
 
 $(shell mkdir -p $(BUILD_DIR))
 
@@ -66,20 +66,23 @@ SDL_CFLAGS = $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
 SDL_LIBS = $(shell $(SYSROOT)/usr/bin/sdl-config --libs)
 
 
-CFLAGS = $(INCLUDE) -DLIBXMP_CORE_PLAYER -D__DINGUX__ $(SDL_CFLAGS)
+CFLAGS = $(INCLUDE) -DLIBXMP_CORE_PLAYER -DDESKTOP_SDL1 $(SDL_CFLAGS)
 CFLAGS += -O3 -fdata-sections -ffunction-sections -fomit-frame-pointer -fno-builtin
 CFLAGS += -fno-common -Wno-write-strings -Wno-sign-compare -ffast-math -ftree-vectorize
 CFLAGS += -funswitch-loops -fno-strict-aliasing
-CFLAGS += -fprofile-use -fprofile-dir=./profile
 
 CXXFLAGS = $(CFLAGS) -std=gnu++14 -fno-exceptions -fno-rtti -fno-math-errno -fno-threadsafe-statics
 LDFLAGS = $(SDL_LIBS) -lSDL_mixer -lSDL_image -lSDL_gfx -flto -s
 
 all: $(TARGET)
 
-$(TARGET) : $(OBJS)
-	$(CMD)$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
+$(OBJS) : $(RESOURCES_BIN)
 
+$(TARGET) : $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) $(LDFLAGS) -o $@
+
+$(RESOURCES_BIN) : | $(RESOURCES_ZIP)
+	unzip $(RESOURCES_ZIP) -d $(GAME_SOURCE_DIR)/
 
 clean:
 	#rm -f $(TARGET); find -L . -name "*.o" -exec rm {} \;
