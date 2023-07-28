@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Modite Adventure
+Comment=Action adventure game by Modus Create
+Exec=modite-adventure.dge
+Terminal=false
+Type=Game
+StartupNotify=true
+Icon=Modite-Adventure-64x64
+Categories=games;
+Version=20230728
+X-OD-Manual=LICENSE

@@ -1,8 +1,14 @@
 
 #  ------------ DINGUX UCLIBC STUFF -----------
-CHAINPREFIX = ~/ldk/mipsel-linux-uclibc
-CROSS_COMPILE = $(CHAINPREFIX)/usr/bin/mipsel-linux
-LD_COMMAND = $(CHAINPREFIX)/mipsel-buildroot-linux-uclibc/bin/ld
+CROSS_COMPILE = mipsel-linux
+
+CXX = $(CROSS_COMPILE)-g++
+CC  = $(CROSS_COMPILE)-cc
+STRIP =  $(CROSS_COMPILE)-strip
+RC  =  $(CROSS_COMPILE)-windres
+
+SYSROOT = $(shell $(CC) --print-sysroot)
+LD_COMMAND = $(SYSROOT)/bin/ld
 
 
 # ----------- SETUP VARS FOR SOURCES --------------
@@ -72,12 +78,6 @@ CPP_OBJS = $(SOURCES:.cpp=.o)
 OBJS += $(CPP_OBJS:.c=.o)
 
 
-CXX = $(CROSS_COMPILE)-g++
-CC  = $(CROSS_COMPILE)-cc
-STRIP =  $(CROSS_COMPILE)-strip
-RC  =  $(CROSS_COMPILE)-windres
-
-SYSROOT = $(shell $(CC) --print-sysroot)
 SDL_CFLAGS = $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
 SDL_LIBS = $(shell $(SYSROOT)/usr/bin/sdl-config --libs)
 
@@ -103,10 +103,14 @@ $(TARGET) : $(OBJS)
 
 
 ipk: $(TARGET)
-	@echo "Packaging..."
+	@echo "Packaging IPK..."
 	${ROOT_DIR}/scripts/package.sh
 .PHONY: ipk
 
+opk: $(TARGET) README.md LICENSE resources/desktop-icon/Modite-Adventure-64x64.png $(RESOURCES_BIN) modite.retrofw.desktop
+	@echo "Packaging OPK..."
+	mksquashfs $^ $(BUILD_DIR)/modite.opk -noappend -no-xattrs
+.PHONY: opk
 
 clean:
 	#rm -f $(TARGET); find -L . -name "*.o" -exec rm {} \;
